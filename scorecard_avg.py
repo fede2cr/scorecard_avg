@@ -21,7 +21,7 @@ for repo in g.get_user(config['user']).get_repos():
     results[repo.name] = json.loads(tmp.decode('utf-8'))
 
 TOTAL = 0
-for repo in results.items():
+for repo in results.keys():
     TOTAL += results[repo]['score']
 
 print(TOTAL/len(results))
