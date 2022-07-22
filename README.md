@@ -20,7 +20,7 @@ python3 scorecard_avg.py
 
 ## Configuration
 
-By defailt this proof-of-concept tool will only print an average of the author or the org's projects. If you'd like to get the individual results, modify the config file to get them saved in json format.
+By default this proof-of-concept tool will only print an average of the author or the org's projects. If you'd like to get the individual results, modify the config file to get them saved in json format.
 
 ### config.yaml
 
