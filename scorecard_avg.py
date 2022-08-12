@@ -2,8 +2,8 @@
 Proof of concept for calculating the average of the OpenSSF's
 scorecard from an author or organization
 '''
-import subprocess
-import json
+import statistics
+import requests
 import yaml
 from github import Github
 
@@ -12,16 +12,22 @@ with open("config.yaml", mode="r", encoding="utf-8") as file:
 
 g = Github(config['token'])
 
+names = []
+scores = []
 results = {}
 for repo in g.get_user(config['user']).get_repos():
-    cmd = 'docker run -e GITHUB_AUTH_TOKEN='+config['token'] + \
-          ' gcr.io/openssf/scorecard:stable --format json --repo=https://github.com/' + \
-          config['user'] + '/' + repo.name
-    tmp = subprocess.check_output(cmd, shell=True)
-    results[repo.name] = json.loads(tmp.decode('utf-8'))
-
-TOTAL = 0
-for repo in results.keys():
-    TOTAL += results[repo]['score']
-
-print(TOTAL/len(results))
+    response = requests.get('https://api.securityscorecards.dev/projects/github.com/' + \
+        config['user'] + '/' + repo.name)
+    if response.status_code == 200:
+        results[response.json()['repo']['name']] = { 'score': response.json()['score'] }
+        results[response.json()['repo']['name']]['checks'] = \
+            { check['name']:check['score'] for check in response.json()['checks'] }
+        names.append(response.json()['repo']['name'])
+        scores.append(response.json()['score'])
+        if len(results) > 5: # While devel
+            break
+print("Average score for: " + config['user'] + " is: " + str(round(statistics.mean(scores), 2)))
+print("Highest score is: " + str(round(max(scores), 2)) + " from project: " + \
+    names[scores.index(max(scores))])
+print("Lowest score is: " + str(round(min(scores), 2)) + " from project: " + \
+    names[scores.index(min(scores))])
