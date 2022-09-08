@@ -17,7 +17,6 @@ jobs:
     permissions:
       # Needed to upload the results to code-scanning dashboard.
       security-events: write
-      # Used to receive a badge. (Upcoming feature)
       id-token: write
       # Needs for private repositories.
       contents: read
